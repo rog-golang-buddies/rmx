@@ -19,7 +19,10 @@ type Server struct {
 
 func (s *Server) initRoutes() {
 	s.Router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello world"))
+		_, err := w.Write([]byte("hello world"))
+		if err != nil {
+			log.Printf("write failed: %v", err.Error())
+		}
 	})
 }
 
