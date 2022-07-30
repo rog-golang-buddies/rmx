@@ -1,8 +1,9 @@
 package req
 
 import (
-	"golang.org/x/exp/slices"
 	"net/http"
+
+	"golang.org/x/exp/slices"
 )
 
 func CheckMethod(m []string, next http.HandlerFunc) http.HandlerFunc {
