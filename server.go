@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/rog-golang-buddies/req"
 	"github.com/rs/cors"
 )
 
@@ -18,12 +19,12 @@ type Server struct {
 }
 
 func (s *Server) initRoutes() {
-	s.Router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	s.Router.HandleFunc("/", req.CheckMethod([]string{req.GET}, func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("hello world"))
 		if err != nil {
 			log.Printf("write failed: %v", err.Error())
 		}
-	})
+	}))
 }
 
 func (s *Server) ServeHTTP() {
