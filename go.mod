@@ -7,7 +7,6 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/rs/cors v1.8.2
 	github.com/spf13/viper v1.12.0
-	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 )
 
 require (
