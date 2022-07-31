@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/rog-golang-buddies/ent"
+	"github.com/rog-golang-buddies/rapidmidiex/ent"
 )
 
 // The UserFunc type is an adapter to allow the use of ordinary

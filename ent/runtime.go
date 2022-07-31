@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"github.com/rog-golang-buddies/ent/schema"
-	"github.com/rog-golang-buddies/ent/user"
+	"github.com/rog-golang-buddies/rapidmidiex/ent/schema"
+	"github.com/rog-golang-buddies/rapidmidiex/ent/user"
 )
 
 // The init function reads all schema descriptors with runtime code

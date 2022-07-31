@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/rog-golang-buddies/ent/predicate"
-	"github.com/rog-golang-buddies/ent/user"
+	"github.com/rog-golang-buddies/rapidmidiex/ent/predicate"
+	"github.com/rog-golang-buddies/rapidmidiex/ent/user"
 
 	"entgo.io/ent"
 )

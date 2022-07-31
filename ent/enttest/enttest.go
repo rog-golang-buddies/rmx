@@ -5,12 +5,12 @@ package enttest
 import (
 	"context"
 
-	"github.com/rog-golang-buddies/ent"
+	"github.com/rog-golang-buddies/rapidmidiex/ent"
 	// required by schema hooks.
-	_ "github.com/rog-golang-buddies/ent/runtime"
+	_ "github.com/rog-golang-buddies/rapidmidiex/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"github.com/rog-golang-buddies/ent/migrate"
+	"github.com/rog-golang-buddies/rapidmidiex/ent/migrate"
 )
 
 type (

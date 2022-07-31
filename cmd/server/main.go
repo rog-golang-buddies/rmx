@@ -5,8 +5,8 @@ import (
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
-	rmx "github.com/rog-golang-buddies"
-	"github.com/rog-golang-buddies/ent"
+	rmx "github.com/rog-golang-buddies/rapidmidiex"
+	"github.com/rog-golang-buddies/rapidmidiex/ent"
 	"github.com/spf13/viper"
 )
 

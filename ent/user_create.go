@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/rog-golang-buddies/ent/user"
+	"github.com/rog-golang-buddies/rapidmidiex/ent/user"
 )
 
 // UserCreate is the builder for creating a User entity.

@@ -2,7 +2,7 @@
 
 package runtime
 
-// The schema-stitching logic is generated in github.com/rog-golang-buddies/ent/runtime.go
+// The schema-stitching logic is generated in github.com/rog-golang-buddies/rapidmidiex/ent/runtime.go
 
 const (
 	Version = "v0.11.1"                                         // Version of ent codegen.

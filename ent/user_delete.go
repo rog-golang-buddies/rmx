@@ -9,8 +9,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/rog-golang-buddies/ent/predicate"
-	"github.com/rog-golang-buddies/ent/user"
+	"github.com/rog-golang-buddies/rapidmidiex/ent/predicate"
+	"github.com/rog-golang-buddies/rapidmidiex/ent/user"
 )
 
 // UserDelete is the builder for deleting a User entity.

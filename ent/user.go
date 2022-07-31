@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/rog-golang-buddies/ent/user"
+	"github.com/rog-golang-buddies/rapidmidiex/ent/user"
 )
 
 // User is the model entity for the User schema.

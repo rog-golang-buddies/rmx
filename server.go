@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/rog-golang-buddies/req"
+	"github.com/rog-golang-buddies/rapidmidiex/req"
 	"github.com/rs/cors"
 	"golang.org/x/sync/errgroup"
 )

@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/rog-golang-buddies/ent/migrate"
+	"github.com/rog-golang-buddies/rapidmidiex/ent/migrate"
 
-	"github.com/rog-golang-buddies/ent/user"
+	"github.com/rog-golang-buddies/rapidmidiex/ent/user"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
