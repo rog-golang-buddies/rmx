@@ -65,6 +65,4 @@ func (s *Server) ServeHTTP() {
 	if err := g.Wait(); err != nil {
 		log.Printf("exit reason: %s \n", err)
 	}
-	// Wait for server context to be stopped
-	<-serverCtx.Done()
 }
