@@ -3,6 +3,7 @@ package rmx
 import (
 	"context"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/rog-golang-buddies/req"
 	"github.com/rs/cors"
+	"golang.org/x/sync/errgroup"
 )
 
 type Server struct {
@@ -36,6 +38,9 @@ func (s *Server) ServeHTTP() {
 	}
 	handler := cors.New(c).Handler(&s.Router)
 
+	serverCtx, serverStop := signal.NotifyContext(context.Background(), syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	defer serverStop()
+
 	server := http.Server{
 		Addr:         s.Port,
 		Handler:      handler,
@@ -43,44 +48,24 @@ func (s *Server) ServeHTTP() {
 		ReadTimeout:  10 * time.Second,  // max time to read request from the client
 		WriteTimeout: 10 * time.Second,  // max time to write response to the client
 		IdleTimeout:  120 * time.Second, // max time for connections using TCP Keep-Alive
+		BaseContext: func(_ net.Listener) context.Context {
+			return serverCtx
+		},
 	}
 
-	serverCtx, serverStopCtx := context.WithCancel(context.Background())
+	g, gCtx := errgroup.WithContext(serverCtx)
+	g.Go(func() error {
+		// Run the server
+		return server.ListenAndServe()
+	})
+	g.Go(func() error {
+		<-gCtx.Done()
+		return server.Shutdown(context.Background())
+	})
 
-	// Listen for syscall signals for process to interrupt/quit
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	go func() {
-		<-sig
-
-		// Shutdown signal with grace period of 30 seconds
-		shutdownCtx, cancel := context.WithTimeout(serverCtx, 30*time.Second)
-
-		go func() {
-			<-shutdownCtx.Done()
-			if shutdownCtx.Err() == context.DeadlineExceeded {
-				log.Fatal("server graceful shutdown timed out. forcing exit.")
-			}
-		}()
-
-		go func() {
-			// Run the server
-			err := server.ListenAndServe()
-			if err != nil && err != http.ErrServerClosed {
-				log.Fatalf("server closing: %v", err.Error())
-			}
-		}()
-
-		// Trigger graceful shutdown
-		err := server.Shutdown(shutdownCtx)
-		if err != nil {
-			log.Fatalf("server shutdown failed: %v", err.Error())
-		}
-		serverStopCtx()
-
-		defer cancel()
-	}()
-
+	if err := g.Wait(); err != nil {
+		log.Printf("exit reason: %s \n", err)
+	}
 	// Wait for server context to be stopped
 	<-serverCtx.Done()
 }
