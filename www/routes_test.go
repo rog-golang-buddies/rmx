@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"gotest.tools/assert"
+	"gotest.tools/assert" // easy to use testing framework
 )
 
 func TestRoutes(t *testing.T) {
