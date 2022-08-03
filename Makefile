@@ -38,7 +38,7 @@ fmt:
 
 ## build_server: Build server binary into bin/ directory
 .PHONY: build_server
-build:
+build_server:
 	$(GOFLAGS) $(GO_BUILD) -a -v -ldflags="-w -s" -o bin/server cmd/server/main.go
 
 ## build_cli: Build cli binary into bin/ directory
