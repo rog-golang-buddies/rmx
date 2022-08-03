@@ -7,10 +7,10 @@ jobs:
     name: Secret Scan
     runs-on: ubuntu-latest
     steps:
-          - name: Check out the repo
-            uses: actions/checkout@v2
-          - name: Run gitleaks
-            run: docker run -v ${{ github.workspace }}:/path zricethezav/gitleaks:latest detect -v --source="/path"  --redact
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Run gitleaks
+        run: docker run -v ${{ github.workspace }}:/path zricethezav/gitleaks:latest detect -v --source="/path"  --redact
 
   run-if-failed:
     name: Github Security Report (if gitleaks job fails)
@@ -20,15 +20,15 @@ jobs:
     permissions:
       security-events: write
     steps:
-    - name: Check out the repo
-      uses: actions/checkout@v2
-    - name: Generate gitleaks SARIF file
-      # Exit 0 so we can get the failed report results from this step.
-      run:  docker run -v ${{ github.workspace }}:/path zricethezav/gitleaks:latest detect -v --source="/path"  --redact --report-format sarif --report-path="/path/result.sarif" --exit-code=0
-    - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        # Path to SARIF file relative to the root of the repository
-        sarif_file: result.sarif
-        # Optional category for the results
-        category: secret-analysis
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Generate gitleaks SARIF file
+        # Exit 0 so we can get the failed report results from this step.
+        run: docker run -v ${{ github.workspace }}:/path zricethezav/gitleaks:latest detect -v --source="/path"  --redact --report-format sarif --report-path="/path/result.sarif" --exit-code=0
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          # Path to SARIF file relative to the root of the repository
+          sarif_file: result.sarif
+          # Optional category for the results
+          category: secret-analysis
