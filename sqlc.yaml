@@ -1,0 +1,11 @@
+version: "2"
+sql:
+- schema: "user/db/user_schema.sql"
+  queries: "user/db/user_query.sql"
+  engine: "mysql"
+  gen:
+    go:
+      package: "user"
+      out: "user"
+      emit_json_tags: true
+      emit_empty_slices: true
