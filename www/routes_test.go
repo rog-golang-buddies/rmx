@@ -21,7 +21,9 @@ func TestRoutes(t *testing.T) {
 
 	tt := []testcase{
 		// {Name: "serving assets", PathName: "/assets/data.json", Method: "GET", Status: http.StatusOK}, // httptest can't test this
-		{Name: "ping pong", PathName: "/ping", Method: "GET", Status: http.StatusOK},
+		{Name: "ping pong test", PathName: "/ping", Method: "GET", Status: http.StatusOK},
+		{Name: "transmitting midi", PathName: "/ws/jam/0", Method: "GET", Status: http.StatusNotImplemented},
+		{Name: "creating p2p connection", PathName: "/ws/signal/0", Method: "GET", Status: http.StatusNotImplemented},
 	}
 
 	srv := httptest.NewServer(NewService())
