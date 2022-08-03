@@ -1,8 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"net/http"
+
+	"github.com/rog-golang-buddies/rapidmidiex/www"
+)
 
 func main() {
 	// Feel free to delete this file.
-	fmt.Println("Hello Gophers")
+	http.ListenAndServe(":8081", www.NewService())
 }
