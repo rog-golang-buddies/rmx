@@ -2,11 +2,11 @@ package main
 
 import (
 	"log"
+	"net/http"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/rog-golang-buddies/rapidmidiex"
+	rmx "github.com/rog-golang-buddies/rapidmidiex"
 	"github.com/rog-golang-buddies/rapidmidiex/api"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -15,21 +15,10 @@ func main() {
 		log.Fatalf("failed to read config: %v", err.Error())
 	}
 
-	jamService := api.JamService{}
+	server := api.NewServer()
 
-	server := api.Server{
-		Port:   ":8080",
-		Router: chi.NewMux(),
-	}
+	port := ":" + viper.GetString("PORT")
+	log.Printf("starting the server on %s%s\n", server.Host, port)
 
-	server.Router.Route("/api/v1", func(r chi.Router) {
-		r.Use(middleware.Logger)
-		r.Route("/jam", func(r chi.Router) {
-			r.Post("/new", jamService.NewSession)
-			r.Get("/{session_id}/join", jamService.JoinSession)
-		})
-	})
-
-	log.Println("starting the server")
-	server.ServeHTTP()
+	log.Fatal(http.ListenAndServe(port, server.Router))
 }
