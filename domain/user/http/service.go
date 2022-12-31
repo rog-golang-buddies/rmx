@@ -3,9 +3,11 @@ package service
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/hyphengolang/prelude/types/email"
 	"github.com/hyphengolang/prelude/types/password"
 	"github.com/hyphengolang/prelude/types/suid"
+
 	service "github.com/rog-golang-buddies/rmx/common/http"
 	"github.com/rog-golang-buddies/rmx/common/sql"
 	"github.com/rog-golang-buddies/rmx/domain/user"
@@ -31,9 +33,11 @@ func NewService(r sql.RWRepo[user.User]) http.Handler {
 }
 
 func (s *userService) routes() {
-	s.mux.Get("/register", s.handleRegister())
-	s.mux.Delete("/register", s.handleUnregister())
-	s.mux.Get("/ping", s.handleHealth())
+	s.mux.Route("/api/v1/user", func(r chi.Router) {
+		r.Post("/register", s.handleRegister())
+		r.Delete("/register", s.handleUnregister())
+		r.Get("/ping", s.handleHealth())
+	})
 }
 
 func (s *userService) handleRegister() http.HandlerFunc {
@@ -84,7 +88,7 @@ func (s *userService) handleRegister() http.HandlerFunc {
 
 func (s *userService) handleUnregister() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.mux.Respond(w, r, "unregister", http.StatusOK)
+		s.mux.Respond(w, r, nil, http.StatusNotImplemented)
 	}
 }
 

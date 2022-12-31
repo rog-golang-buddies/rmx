@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rog-golang-buddies/rmx/docker/container"
 	"github.com/rog-golang-buddies/rmx/domain/user"
 
 	"github.com/hyphengolang/prelude/types/email"
@@ -13,7 +14,23 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rog-golang-buddies/rmx/common/sql"
+
+	_ "embed"
 )
+
+//go:embed init/init.sql
+var migration string
+
+// NOTE - for testing purposes only
+func NewUserDatabase(ctx context.Context, port string, user string, password string, dbName string, occurrence int, startUpTimeout time.Duration) (*container.PostgresContainer, *pgxpool.Pool, error) {
+	c, pg, err := container.NewDefaultPostgres(ctx, port, user, password, dbName, occurrence, startUpTimeout)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	_, err = pg.Exec(ctx, migration)
+	return c, pg, err
+}
 
 var (
 	ErrInvalidKey = fmt.Errorf("invalid key type")
@@ -69,7 +86,12 @@ func (r *repo) Write(ctx context.Context, u *user.User) error {
 		"password": u.Password,
 	}
 
-	return r.rh.Exec(ctx, qryInsert, args)
+	if err := r.rh.Exec(ctx, qryInsert, args); err != nil {
+		r.rh.Logf("error writing user: %v", err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *repo) Remove(ctx context.Context, key any) error {
