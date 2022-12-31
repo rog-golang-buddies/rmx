@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"log"
 	"net/http"
 
@@ -11,8 +10,6 @@ import (
 
 type Service interface {
 	chi.Router
-
-	Context() context.Context
 
 	Log(...any)
 	Logf(string, ...any)
@@ -25,16 +22,7 @@ type Service interface {
 }
 
 type service struct {
-	ctx context.Context
 	chi.Router
-}
-
-// Context implements Service
-func (s *service) Context() context.Context {
-	if s.ctx == nil {
-		return context.Background()
-	}
-	return s.ctx
 }
 
 // Created implements Service
@@ -61,6 +49,6 @@ func (s *service) RespondText(w http.ResponseWriter, r *http.Request, status int
 // SetCookie implements Service
 func (*service) SetCookie(w http.ResponseWriter, c *http.Cookie) { http.SetCookie(w, c) }
 
-func New(ctx context.Context, mux chi.Router) Service {
-	return &service{ctx, mux}
+func New(mux chi.Router) Service {
+	return &service{chi.NewMux()}
 }
