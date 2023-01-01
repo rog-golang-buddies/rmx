@@ -86,3 +86,47 @@ func NewDefaultPostgres(ctx context.Context, port string, user, password, dbName
 
 	return c, conn, err
 }
+
+func NewPostgresContainer(ctx context.Context, internal nat.Port, opts ...options.ContainerOption) (*PostgresContainer, *pgxpool.Pool, error) {
+	req := testcontainers.ContainerRequest{
+		Image:        "postgres:11-alpine",
+		Env:          map[string]string{},
+		ExposedPorts: []string{internal.Port()},
+		Cmd:          []string{"postgres", "-c", "fsync=off"},
+	}
+
+	for _, opt := range opts {
+		opt(&req)
+	}
+
+	if len(req.ExposedPorts) != 1 {
+		return nil, nil, fmt.Errorf("exposed ports must be exactly 1")
+	}
+
+	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{ContainerRequest: req, Started: true})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	postgresContainer := &PostgresContainer{Container: container}
+
+	externalPort, err := postgresContainer.MappedPort(ctx, internal)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	externalHost, err := postgresContainer.Host(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		externalHost, externalPort.Port(), req.Env["POSTGRES_USER"], req.Env["POSTGRES_PASSWORD"], req.Env["POSTGRES_DB"])
+
+	conn, err := pgxpool.New(ctx, connStr)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return postgresContainer, conn, nil
+}
