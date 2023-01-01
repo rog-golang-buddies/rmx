@@ -92,7 +92,7 @@ func (b *Broker[SI, CI]) connect(s *Subscriber[SI, CI]) {
 
 			for _, c := range cs {
 				if err := c.write(m.marshall()); err != nil {
-					s.errc <- &wserr[CI]{c, err}
+					s.errc <- &Err[CI]{c, err}
 				}
 			}
 		}

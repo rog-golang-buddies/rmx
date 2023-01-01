@@ -14,7 +14,7 @@ import (
 	"github.com/gobwas/ws/wsutil"
 	"github.com/hyphengolang/prelude/testing/is"
 	"github.com/hyphengolang/prelude/types/suid"
-	"github.com/rog-golang-buddies/rmx/internal/websocket"
+	"github.com/rog-golang-buddies/rmx/internal/http/websocket"
 )
 
 // so I am defining a simple echo server here for testing
@@ -93,7 +93,7 @@ func testServerPartB() http.Handler {
 		Username string
 	}
 
-	b := websocket.NewBroker[Info, any](3, ctx)
+	b := websocket.NewBroker[Info, any](ctx, 3)
 
 	mux := http.NewServeMux()
 
@@ -165,10 +165,6 @@ func TestBroker(t *testing.T) {
 	})
 }
 
-var resource = func(s string) string {
-	return s[strings.LastIndex(s, "/")+1:]
-}
-
 var stripPrefix = func(s string) string {
 	return "ws" + strings.TrimPrefix(s, "http")
 }
@@ -176,7 +172,3 @@ var stripPrefix = func(s string) string {
 func parseSUID(w http.ResponseWriter, r *http.Request) (suid.UUID, error) {
 	return suid.ParseString(chi.URLParam(r, "uuid"))
 }
-
-/*
-
- */
