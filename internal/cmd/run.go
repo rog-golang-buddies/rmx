@@ -14,8 +14,9 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/rog-golang-buddies/rmx/config"
-	"github.com/rog-golang-buddies/rmx/service"
-	"github.com/rog-golang-buddies/rmx/store"
+
+	// "github.com/rog-golang-buddies/rmx/service"
+	// "github.com/rog-golang-buddies/rmx/store"
 	"github.com/rs/cors"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/sync/errgroup"
@@ -257,14 +258,15 @@ func serve(cfg *config.Config) error {
 		AllowedHeaders:   []string{"Origin", "Content-Type", "Accept", "Authorization"},
 	}
 
+	/* FIXME - this is 100% not going to build, API will need to be looked at */
 	// init application store
-	s, _ := store.New(sCtx, "") // needs fix
+	// s, _ := store.New(sCtx, "") // needs fix
 	// setup a new handler
-	h := service.New(sCtx, s)
+	// h := service.New(sCtx, s)
 
 	srv := http.Server{
 		Addr:    ":" + cfg.ServerPort,
-		Handler: cors.New(c).Handler(h),
+		Handler: cors.New(c).Handler(http.NotFoundHandler()),
 		// max time to read request from the client
 		ReadTimeout: 10 * time.Second,
 		// max time to write response to the client
