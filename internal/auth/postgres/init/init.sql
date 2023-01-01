@@ -6,4 +6,5 @@ create table if not exists "credentials" (
     password citext not null check (password <> ''),
     created_at timestamp not null default now()
 );
-
+-- INDEX on email
+create index if not exists "credentials_email_idx" on "credentials" (email);

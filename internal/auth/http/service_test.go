@@ -1,22 +1,18 @@
 package service_test
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"sync"
 	"testing"
 
-	intern "github.com/rog-golang-buddies/rmx/internal/auth"
 	srv "github.com/rog-golang-buddies/rmx/internal/auth/http"
-	repo "github.com/rog-golang-buddies/rmx/internal/auth/postgres"
 	token "github.com/rog-golang-buddies/rmx/internal/auth/redis/v1"
+	"github.com/rog-golang-buddies/rmx/test"
 
 	"github.com/hyphengolang/prelude/testing/is"
-	"github.com/hyphengolang/prelude/types/email"
 )
 
 const applicationJson = "application/json"
@@ -25,15 +21,13 @@ func TestAuthService(t *testing.T) {
 	is := is.New(t)
 
 	var authServer *httptest.Server
-	t.Run("init service", func(t *testing.T) {
+	{
 		tc := token.NewClient()
-		h := srv.NewService(mockCredentialsRepo(), srv.WithTokenClient(tc))
+		h := srv.NewService(test.NewCredentialsRepo(), srv.WithTokenClient(tc))
 		authServer = httptest.NewServer(h)
-	})
 
-	t.Cleanup(func() {
-		authServer.Close()
-	})
+		t.Cleanup(func() { authServer.Close() })
+	}
 
 	t.Run("register new user's credentials", func(t *testing.T) {
 		payload := `
@@ -82,50 +76,4 @@ func TestAuthService(t *testing.T) {
 		res, _ := authServer.Client().Do(req)
 		is.Equal(res.StatusCode, http.StatusNoContent) // delete cookie
 	})
-}
-
-type credentialsRepo struct {
-	mc sync.Map
-}
-
-// Read implements repo.CredentialsRepo
-func (c *credentialsRepo) Read(ctx context.Context, key any) (*intern.Credentials, error) {
-	if email, ok := key.(email.Email); !ok {
-		return nil, fmt.Errorf("invalid key type")
-	} else {
-		if creds, ok := c.mc.Load(email); ok {
-			return creds.(*intern.Credentials), nil
-		} else {
-			return nil, fmt.Errorf("credentials not found")
-		}
-	}
-}
-
-// ReadAll implements repo.CredentialsRepo
-func (*credentialsRepo) ReadAll(ctx context.Context) ([]intern.Credentials, error) {
-	panic("unimplemented")
-}
-
-// Remove implements repo.CredentialsRepo
-func (*credentialsRepo) Remove(ctx context.Context, key any) error {
-	panic("unimplemented")
-}
-
-// Write implements repo.CredentialsRepo
-func (c *credentialsRepo) Write(ctx context.Context, creds *intern.Credentials) error {
-	if _, ok := c.mc.Load(creds.Email); ok {
-		return fmt.Errorf("user already exists")
-	} else {
-		c.mc.Store(creds.Email, creds)
-	}
-
-	return nil
-}
-
-func mockCredentialsRepo() repo.CredentialsRepo {
-	c := &credentialsRepo{
-		mc: sync.Map{},
-	}
-
-	return c
 }

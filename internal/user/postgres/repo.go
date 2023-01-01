@@ -109,11 +109,13 @@ func (r *repo) Remove(ctx context.Context, key any) error {
 	return r.rh.Exec(ctx, qry, key)
 }
 
+type UserRepo sql.RWRepo[user.User]
+
 type repo struct {
 	rh sql.PSQLHandler[user.User]
 }
 
-func New(conn *pgxpool.Pool) sql.RWRepo[user.User] {
+func New(conn *pgxpool.Pool) UserRepo {
 	r := &repo{
 		rh: sql.NewPSQLHandler[user.User](conn),
 	}
