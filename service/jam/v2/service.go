@@ -48,24 +48,20 @@ const (
 )
 
 type User struct {
-	id       suid.UUID
 	Username string `json:"username"`
 }
 
 func (u *User) fillDefaults() {
-	u.id = suid.NewUUID()
 	if strings.TrimSpace(u.Username) == "" {
-		u.Username = u.id.String()
+		u.Username = "User-" + suid.NewSUID().String()
 	}
 }
 
 type Jam struct {
-	// Unique Jam identifier.
-	ID suid.UUID `json:"id,omitempty"`
-	// Owning user of the Jam.
-	owner *User
 	// Public name of the Jam.
 	Name string `json:"name,omitempty"`
+	// Owning user of the Jam. (not implemented yet)
+	Owner *User `json:"owner,omitempty"`
 	// Max number of Jam participants.
 	Capacity uint `json:"capacity,omitempty"`
 	// Beats per minute. Used for setting the tempo of MIDI playback.
@@ -73,12 +69,8 @@ type Jam struct {
 }
 
 func (j *Jam) fillDefaults() {
-	j.ID = suid.NewUUID()
-	if j.owner == nil {
-		j.owner = &User{j.ID, j.Name}
-	}
 	if strings.TrimSpace(j.Name) == "" {
-		j.Name = j.ID.ShortUUID().String()
+		j.Name = "Jam-" + suid.NewSUID().String()
 	}
 	if j.Capacity == 0 {
 		j.Capacity = 10
@@ -161,10 +153,18 @@ func (s *Service) handleGetRoomUsers(b *websocket.Broker[Jam, User]) http.Handle
 }
 
 func (s *Service) handleListRooms(b *websocket.Broker[Jam, User]) http.HandlerFunc {
+	type response struct {
+		ID suid.SUID `json:"id"`
+		Jam
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		subs := b.ListSubscribers()
-		subsInfo := fp.FMap(subs, func(s *websocket.Subscriber[Jam, User]) Jam {
-			return *s.Info
+		subsInfo := fp.FMap(subs, func(s *websocket.Subscriber[Jam, User]) *response {
+			return &response{
+				ID:  s.GetID().ShortUUID(),
+				Jam: *s.Info,
+			}
 		})
 
 		s.Respond(w, r, subsInfo, http.StatusOK)
