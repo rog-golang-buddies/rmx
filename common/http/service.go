@@ -8,6 +8,8 @@ import (
 	h "github.com/hyphengolang/prelude/http"
 )
 
+type Option[T http.Handler] func(T)
+
 type Service interface {
 	chi.Router
 
@@ -21,34 +23,38 @@ type Service interface {
 	SetCookie(http.ResponseWriter, *http.Cookie)
 }
 
-type service struct {
+type serviceHandler struct {
 	chi.Router
 }
 
 // Created implements Service
-func (*service) Created(w http.ResponseWriter, r *http.Request, id string) { h.Created(w, r, id) }
+func (*serviceHandler) Created(w http.ResponseWriter, r *http.Request, id string) {
+	h.Created(w, r, id)
+}
 
 // Decode implements Service
-func (*service) Decode(w http.ResponseWriter, r *http.Request, v any) error { return h.Decode(w, r, v) }
+func (*serviceHandler) Decode(w http.ResponseWriter, r *http.Request, v any) error {
+	return h.Decode(w, r, v)
+}
 
 // Log implements Service
-func (*service) Log(v ...any) { log.Println(v...) }
+func (*serviceHandler) Log(v ...any) { log.Println(v...) }
 
 // Logf implements Service
-func (*service) Logf(format string, v ...any) { log.Printf(format, v...) }
+func (*serviceHandler) Logf(format string, v ...any) { log.Printf(format, v...) }
 
 // Respond implements Service
-func (*service) Respond(w http.ResponseWriter, r *http.Request, v any, status int) {
+func (*serviceHandler) Respond(w http.ResponseWriter, r *http.Request, v any, status int) {
 	h.Respond(w, r, v, status)
 }
 
-func (s *service) RespondText(w http.ResponseWriter, r *http.Request, status int) {
+func (s *serviceHandler) RespondText(w http.ResponseWriter, r *http.Request, status int) {
 	s.Respond(w, r, http.StatusText(status), status)
 }
 
 // SetCookie implements Service
-func (*service) SetCookie(w http.ResponseWriter, c *http.Cookie) { http.SetCookie(w, c) }
+func (*serviceHandler) SetCookie(w http.ResponseWriter, c *http.Cookie) { http.SetCookie(w, c) }
 
 func New() Service {
-	return &service{chi.NewMux()}
+	return &serviceHandler{chi.NewMux()}
 }
